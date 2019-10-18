@@ -1,9 +1,15 @@
-package com.vitiello.android.retrofitgithub
+package com.vitiello.android.retrofitgithub.viewmodel
 
 import android.text.TextUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.gson.GsonBuilder
+import com.vitiello.android.retrofitgithub.BuildConfig
+import com.vitiello.android.retrofitgithub.model.GithubIssue
+import com.vitiello.android.retrofitgithub.model.GithubRepo
+import com.vitiello.android.retrofitgithub.network.GithubService
+import com.vitiello.android.retrofitgithub.network.map.mapGithubIssues
+import com.vitiello.android.retrofitgithub.network.map.mapGithubRepos
+import com.vitiello.android.retrofitgithub.tools.SingleEvent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -38,13 +44,8 @@ class MainViewModel : ViewModel() {
             password = BuildConfig.password
         }
 
-        val gson = GsonBuilder()
-            .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-            .registerTypeAdapter(GithubRepo::class.java, GithubRepoDeserializer())
-            .create()
-
         val logInterceptor = HttpLoggingInterceptor().apply {
-            setLevel(HttpLoggingInterceptor.Level.BODY)
+            level = HttpLoggingInterceptor.Level.BODY
         }
 
         val basicInterceptor = Interceptor { chain ->
@@ -68,11 +69,29 @@ class MainViewModel : ViewModel() {
             .baseUrl(GithubService.ENDPOINT)
             .client(okHttpClient)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-//            .addConverterFactory(GsonConverterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create(gson))
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         mGithubService = retrofit.create(GithubService::class.java)
+    }
+
+    fun getRepositories() {
+        compositeDisposable.add(
+            mGithubService.repos
+                .subscribeOn(Schedulers.io())
+                //.observeOn(AndroidSchedulers.mainThread())
+                .map(::mapGithubRepos)
+                .subscribe({ repos ->
+                    repositoriesLiveData.postValue(repos)
+                }, { exc ->
+                    networkErrorLiveData.postValue(
+                        SingleEvent(
+                            true
+                        )
+                    )
+                    exc.printStackTrace()
+                })
+        )
     }
 
     fun getIssues(owner: String, name: String) {
@@ -80,30 +99,15 @@ class MainViewModel : ViewModel() {
             mGithubService.getIssues(owner, name)
                 .subscribeOn(Schedulers.io())
                 //.observeOn(AndroidSchedulers.mainThread())
+                .map(::mapGithubIssues)
                 .subscribe({ issues ->
                     issuesLiveData.postValue(issues)
                 }, { exc ->
-                    networkErrorLiveData.postValue(SingleEvent(true))
-                    exc.printStackTrace()
-                })
-        )
-    }
-
-    override fun onCleared() {
-        if (!compositeDisposable.isDisposed) {
-            compositeDisposable.dispose()
-        }
-    }
-
-    fun loadRepositories() {
-        compositeDisposable.add(
-            mGithubService.repos
-                .subscribeOn(Schedulers.io())
-                //.observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ repositories ->
-                    repositoriesLiveData.postValue(repositories)
-                }, { exc ->
-                    networkErrorLiveData.postValue(SingleEvent(true))
+                    networkErrorLiveData.postValue(
+                        SingleEvent(
+                            true
+                        )
+                    )
                     exc.printStackTrace()
                 })
         )
@@ -115,20 +119,34 @@ class MainViewModel : ViewModel() {
             return
         } else {
             issue.comment = comment
-            issue.comments_url?.let {
+            issue.commentsUrl?.let {
                 compositeDisposable.add(
                     mGithubService.postComment(it, issue)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
-                            commentLiveData.postValue(SingleEvent(true))
+                            commentLiveData.postValue(
+                                SingleEvent(
+                                    true
+                                )
+                            )
                         }, { exc ->
-                            networkErrorLiveData.postValue(SingleEvent(true))
+                            networkErrorLiveData.postValue(
+                                SingleEvent(
+                                    true
+                                )
+                            )
                             exc.printStackTrace()
                         })
                 )
             }
                 ?: errorLiveData.postValue(SingleEvent("Undefined comment url, please try again later"))
+        }
+    }
+
+    override fun onCleared() {
+        if (!compositeDisposable.isDisposed) {
+            compositeDisposable.dispose()
         }
     }
 

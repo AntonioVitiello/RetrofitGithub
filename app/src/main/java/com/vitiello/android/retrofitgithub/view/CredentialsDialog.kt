@@ -1,4 +1,4 @@
-package com.vitiello.android.retrofitgithub
+package com.vitiello.android.retrofitgithub.view
 
 import android.app.Dialog
 import android.content.Context
@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import com.vitiello.android.retrofitgithub.R
+import com.vitiello.android.retrofitgithub.tools.isNotEmpty
 
 /**
  * Created by Antonio Vitiello on 17/10/2019.
@@ -53,7 +55,10 @@ class CredentialsDialog : DialogFragment() {
             .setTitle("Credentials")
             .setNegativeButton("Cancel", null)
             .setPositiveButton("Continue") { dialog, which ->
-                isNotEmpty(usernameEditText.text.toString(), passwordEditText.text.toString()) { username, password ->
+                isNotEmpty(
+                    usernameEditText.text.toString(),
+                    passwordEditText.text.toString()
+                ) { username, password ->
                     listener.onDialogPositiveClick(username, password)
                 }
             }

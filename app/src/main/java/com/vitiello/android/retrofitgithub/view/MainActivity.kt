@@ -1,4 +1,4 @@
-package com.vitiello.android.retrofitgithub
+package com.vitiello.android.retrofitgithub.view
 
 import android.os.Bundle
 import android.view.Menu
@@ -10,6 +10,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.vitiello.android.retrofitgithub.viewmodel.MainViewModel
+import com.vitiello.android.retrofitgithub.R
+import com.vitiello.android.retrofitgithub.model.GithubIssue
+import com.vitiello.android.retrofitgithub.model.GithubRepo
+import com.vitiello.android.retrofitgithub.tools.SingleEvent
+import com.vitiello.android.retrofitgithub.tools.isNotEmpty
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**
@@ -54,7 +60,10 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
             ) {
                 if (adapter.selectedItem is GithubRepo) {
                     val githubRepo = adapter.selectedItem as GithubRepo
-                    isNotEmpty(githubRepo.owner, githubRepo.name) { owner, name ->
+                    isNotEmpty(
+                        githubRepo.owner,
+                        githubRepo.name
+                    ) { owner, name ->
                         mViewModel.getIssues(owner, name)
                     }
                 }
@@ -153,7 +162,7 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
 
     fun onClick(view: View) {
         when (view.id) {
-            R.id.loadReposButtons -> mViewModel.loadRepositories()
+            R.id.loadReposButtons -> mViewModel.getRepositories()
             R.id.sendButton -> mViewModel.addComment(
                 commentEditText.text.toString(),
                 issuesSpinner.selectedItem as GithubIssue

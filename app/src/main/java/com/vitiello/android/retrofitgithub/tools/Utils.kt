@@ -1,4 +1,4 @@
-package com.vitiello.android.retrofitgithub
+package com.vitiello.android.retrofitgithub.tools
 
 /**
  * Created by Antonio Vitiello on 16/10/2019.
