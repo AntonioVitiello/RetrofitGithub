@@ -1,6 +1,6 @@
 package com.vitiello.android.retrofitgithub.network
 
-import com.vitiello.android.retrofitgithub.model.GithubIssue
+import com.vitiello.android.retrofitgithub.network.dto.GithubAddComment
 import com.vitiello.android.retrofitgithub.network.dto.GithubIssueData
 import com.vitiello.android.retrofitgithub.network.dto.GithubRepoData
 import io.reactivex.Completable
@@ -19,7 +19,7 @@ interface GithubService {
     fun getIssues(@Path("owner") owner: String, @Path("repo") repository: String): Single<List<GithubIssueData>>
 
     @POST
-    fun postComment(@Url url: String, @Body issue: GithubIssue): Completable
+    fun postComment(@Url url: String, @Body issue: GithubAddComment): Completable
 
     companion object {
         val ENDPOINT = "https://api.github.com"

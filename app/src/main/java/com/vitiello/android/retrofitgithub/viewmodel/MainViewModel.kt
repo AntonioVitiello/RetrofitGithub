@@ -7,6 +7,7 @@ import com.vitiello.android.retrofitgithub.BuildConfig
 import com.vitiello.android.retrofitgithub.model.GithubIssue
 import com.vitiello.android.retrofitgithub.model.GithubRepo
 import com.vitiello.android.retrofitgithub.network.GithubService
+import com.vitiello.android.retrofitgithub.network.dto.GithubAddComment
 import com.vitiello.android.retrofitgithub.network.map.mapGithubIssues
 import com.vitiello.android.retrofitgithub.network.map.mapGithubRepos
 import com.vitiello.android.retrofitgithub.tools.SingleEvent
@@ -118,18 +119,16 @@ class MainViewModel : ViewModel() {
             errorLiveData.postValue(SingleEvent("Please enter a comment"))
             return
         } else {
+            val gitComment =
+                GithubAddComment(body = comment, id = issue.id!!, title = issue.title!!)
             issue.comment = comment
             issue.commentsUrl?.let {
                 compositeDisposable.add(
-                    mGithubService.postComment(it, issue)
+                    mGithubService.postComment(it, gitComment)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
-                            commentLiveData.postValue(
-                                SingleEvent(
-                                    true
-                                )
-                            )
+                            commentLiveData.postValue(SingleEvent(true))
                         }, { exc ->
                             networkErrorLiveData.postValue(
                                 SingleEvent(

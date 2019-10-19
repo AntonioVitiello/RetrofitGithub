@@ -13,7 +13,7 @@ fun mapGithubIssues(list: List<GithubIssueData>): List<GithubIssue> {
             add(GithubIssue().apply {
                 id = item.id
                 title = item.title
-                commentsUrl = item.commentsUrl
+                commentsUrl = item.comments_url
             })
         }
     }
