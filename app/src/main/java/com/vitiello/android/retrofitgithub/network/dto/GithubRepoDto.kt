@@ -1,11 +1,13 @@
 package com.vitiello.android.retrofitgithub.network.dto
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 
 /**
  * Created by Antonio Vitiello on 19/10/2019.
  */
-data class GithubRepoData(
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class GithubRepoDto(
     @JsonProperty("id")
     val id: Int?,
     @JsonProperty("node_id")

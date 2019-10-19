@@ -4,23 +4,17 @@ import android.text.TextUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vitiello.android.retrofitgithub.BuildConfig
-import com.vitiello.android.retrofitgithub.model.GithubIssue
-import com.vitiello.android.retrofitgithub.model.GithubRepo
+import com.vitiello.android.retrofitgithub.model.GithubIssueModel
+import com.vitiello.android.retrofitgithub.model.GithubRepoModel
+import com.vitiello.android.retrofitgithub.network.GithubProvider
 import com.vitiello.android.retrofitgithub.network.GithubService
-import com.vitiello.android.retrofitgithub.network.dto.GithubAddComment
+import com.vitiello.android.retrofitgithub.network.dto.GithubAddCommentDto
 import com.vitiello.android.retrofitgithub.network.map.mapGithubIssues
 import com.vitiello.android.retrofitgithub.network.map.mapGithubRepos
 import com.vitiello.android.retrofitgithub.tools.SingleEvent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import okhttp3.Credentials
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
 
 
 /**
@@ -28,52 +22,23 @@ import retrofit2.converter.gson.GsonConverterFactory
  */
 class MainViewModel : ViewModel() {
 
-    var username: String = ""
-    var password: String = ""
-    private var mGithubService: GithubService
+    var username: String = BuildConfig.username
+        private set
+    var password: String = BuildConfig.password
+        private set
+    private lateinit var mGithubService: GithubService
     private val compositeDisposable = CompositeDisposable()
 
-    val issuesLiveData = MutableLiveData<List<GithubIssue>>()
-    val repositoriesLiveData = MutableLiveData<List<GithubRepo>>()
+    val issuesLiveData = MutableLiveData<List<GithubIssueModel>>()
+    val repositoriesLiveData = MutableLiveData<List<GithubRepoModel>>()
     val commentLiveData = MutableLiveData<SingleEvent<Boolean>>()
     val networkErrorLiveData = MutableLiveData<SingleEvent<Boolean>>()
     val errorLiveData = MutableLiveData<SingleEvent<String>>()
 
-    init {
-        if (BuildConfig.DEBUG) {
-            username = BuildConfig.username
-            password = BuildConfig.password
-        }
-
-        val logInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
-
-        val basicInterceptor = Interceptor { chain ->
-            val originalRequest = chain.request()
-
-            val builder = originalRequest.newBuilder().header(
-                "Authorization",
-                Credentials.basic(username, password)
-            )
-
-            val newRequest = builder.build()
-            chain.proceed(newRequest)
-        }
-
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(basicInterceptor)
-            .addInterceptor(logInterceptor)
-            .build()
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl(GithubService.ENDPOINT)
-            .client(okHttpClient)
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        mGithubService = retrofit.create(GithubService::class.java)
+    fun init(username: String, password: String) {
+        this.username = username
+        this.password = password
+        mGithubService = GithubProvider.getInstance(username, password).service
     }
 
     fun getRepositories() {
@@ -114,13 +79,13 @@ class MainViewModel : ViewModel() {
         )
     }
 
-    fun addComment(comment: String, issue: GithubIssue) {
+    fun addComment(comment: String, issue: GithubIssueModel) {
         if (TextUtils.isEmpty(comment)) {
             errorLiveData.postValue(SingleEvent("Please enter a comment"))
             return
         } else {
             val gitComment =
-                GithubAddComment(body = comment, id = issue.id!!, title = issue.title!!)
+                GithubAddCommentDto(body = comment, id = issue.id!!, title = issue.title!!)
             issue.comment = comment
             issue.commentsUrl?.let {
                 compositeDisposable.add(

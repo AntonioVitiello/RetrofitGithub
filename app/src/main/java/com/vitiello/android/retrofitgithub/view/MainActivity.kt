@@ -10,12 +10,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.vitiello.android.retrofitgithub.viewmodel.MainViewModel
 import com.vitiello.android.retrofitgithub.R
-import com.vitiello.android.retrofitgithub.model.GithubIssue
-import com.vitiello.android.retrofitgithub.model.GithubRepo
+import com.vitiello.android.retrofitgithub.model.GithubIssueModel
+import com.vitiello.android.retrofitgithub.model.GithubRepoModel
 import com.vitiello.android.retrofitgithub.tools.SingleEvent
 import com.vitiello.android.retrofitgithub.tools.isNotEmpty
+import com.vitiello.android.retrofitgithub.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**
@@ -58,8 +58,8 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
                 position: Int,
                 id: Long
             ) {
-                if (adapter.selectedItem is GithubRepo) {
-                    val githubRepo = adapter.selectedItem as GithubRepo
+                if (adapter.selectedItem is GithubRepoModel) {
+                    val githubRepo = adapter.selectedItem as GithubRepoModel
                     isNotEmpty(
                         githubRepo.owner,
                         githubRepo.name
@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
         )
     }
 
-    private fun onRepositoriesResponse(repositories: List<GithubRepo>) {
+    private fun onRepositoriesResponse(repositories: List<GithubRepoModel>) {
         val spinnerAdapter = if (repositories.isEmpty()) {
             repositoriesSpinner.isEnabled = false
             ArrayAdapter(
@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
         }
     }
 
-    private fun onIssuesResponse(issues: List<GithubIssue>) {
+    private fun onIssuesResponse(issues: List<GithubIssueModel>) {
         issuesSpinner.adapter = if (issues.isEmpty()) {
             issuesSpinner.isEnabled = false
             commentEditText.isEnabled = false
@@ -165,14 +165,13 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
             R.id.loadReposButtons -> mViewModel.getRepositories()
             R.id.sendButton -> mViewModel.addComment(
                 commentEditText.text.toString(),
-                issuesSpinner.selectedItem as GithubIssue
+                issuesSpinner.selectedItem as GithubIssueModel
             )
         }
     }
 
     override fun onDialogPositiveClick(username: String, password: String) {
-        mViewModel.username = username
-        mViewModel.password = password
+        mViewModel.init(username, password)
         loadReposButtons.isEnabled = true
     }
 

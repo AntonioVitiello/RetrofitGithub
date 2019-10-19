@@ -3,7 +3,7 @@ package com.vitiello.android.retrofitgithub.model
 /**
  * Created by Antonio Vitiello on 17/10/2019.
  */
-class GithubIssue {
+class GithubIssueModel {
 
     var id: String? = null
     var title: String? = null

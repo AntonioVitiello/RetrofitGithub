@@ -5,11 +5,11 @@ import com.fasterxml.jackson.annotation.JsonProperty
 /**
  * Created by Antonio Vitiello on 19/10/2019.
  */
-data class GithubIssueData(
+data class GithubAddCommentDto(
     @JsonProperty("id")
-    val id: String?,
+    var id: String,
     @JsonProperty("title")
-    val title: String?,
-    @JsonProperty("comments_url")
-    val comments_url: String?
+    var title: String,
+    @JsonProperty("body")
+    var body: String
 )

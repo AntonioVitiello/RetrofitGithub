@@ -1,8 +1,8 @@
 package com.vitiello.android.retrofitgithub.network
 
-import com.vitiello.android.retrofitgithub.network.dto.GithubAddComment
-import com.vitiello.android.retrofitgithub.network.dto.GithubIssueData
-import com.vitiello.android.retrofitgithub.network.dto.GithubRepoData
+import com.vitiello.android.retrofitgithub.network.dto.GithubAddCommentDto
+import com.vitiello.android.retrofitgithub.network.dto.GithubIssueDto
+import com.vitiello.android.retrofitgithub.network.dto.GithubRepoDto
 import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.http.*
@@ -13,13 +13,13 @@ import retrofit2.http.*
 interface GithubService {
 
     @get:GET("user/repos?per_page=100")
-    val repos: Single<List<GithubRepoData>>
+    val repos: Single<List<GithubRepoDto>>
 
     @GET("/repos/{owner}/{repo}/issues")
-    fun getIssues(@Path("owner") owner: String, @Path("repo") repository: String): Single<List<GithubIssueData>>
+    fun getIssues(@Path("owner") owner: String, @Path("repo") repository: String): Single<List<GithubIssueDto>>
 
     @POST
-    fun postComment(@Url url: String, @Body issue: GithubAddComment): Completable
+    fun postComment(@Url url: String, @Body issue: GithubAddCommentDto): Completable
 
     companion object {
         val ENDPOINT = "https://api.github.com"
