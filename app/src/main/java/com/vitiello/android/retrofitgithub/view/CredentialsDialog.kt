@@ -1,5 +1,6 @@
 package com.vitiello.android.retrofitgithub.view
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
@@ -21,6 +22,7 @@ class CredentialsDialog : DialogFragment() {
     }
 
     companion object {
+        const val TAG = "CredentialsDialog"
         private const val USERNAME_ARGS_KEY = "username_args_key"
         private const val PASSWORD_ARGS_KEY = "password_args_key"
 
@@ -39,9 +41,10 @@ class CredentialsDialog : DialogFragment() {
         super.onAttach(context)
         if (activity is ICredentialsDialogListener) {
             listener = activity as ICredentialsDialogListener
-        } else throw IllegalArgumentException("Owner should implements ICredentialsDialogListener interface")
+        } else throw IllegalArgumentException(getString(R.string.implements_icredentials))
     }
 
+    @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val view = activity!!.layoutInflater.inflate(R.layout.dialog_credentials, null)
         val usernameEditText = view.findViewById<EditText>(R.id.usernameEditText).apply {
@@ -52,9 +55,9 @@ class CredentialsDialog : DialogFragment() {
         }
         val builder = AlertDialog.Builder(activity!!)
             .setView(view)
-            .setTitle("Credentials")
-            .setNegativeButton("Cancel", null)
-            .setPositiveButton("Continue") { dialog, which ->
+            .setTitle(getString(R.string.credentials))
+            .setNegativeButton(getString(R.string.cancel), null)
+            .setPositiveButton(getString(R.string.accept)) { dialog, which ->
                 isNotEmpty(
                     usernameEditText.text.toString(),
                     passwordEditText.text.toString()

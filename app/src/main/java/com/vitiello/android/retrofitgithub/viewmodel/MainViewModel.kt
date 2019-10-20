@@ -3,11 +3,12 @@ package com.vitiello.android.retrofitgithub.viewmodel
 import android.text.TextUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.vitiello.android.retrofitgithub.App
 import com.vitiello.android.retrofitgithub.BuildConfig
+import com.vitiello.android.retrofitgithub.R
 import com.vitiello.android.retrofitgithub.model.GithubIssueModel
 import com.vitiello.android.retrofitgithub.model.GithubRepoModel
-import com.vitiello.android.retrofitgithub.network.GithubProvider
-import com.vitiello.android.retrofitgithub.network.GithubService
+import com.vitiello.android.retrofitgithub.network.GithubRepository
 import com.vitiello.android.retrofitgithub.network.dto.GithubAddCommentDto
 import com.vitiello.android.retrofitgithub.network.map.mapGithubIssues
 import com.vitiello.android.retrofitgithub.network.map.mapGithubRepos
@@ -26,24 +27,23 @@ class MainViewModel : ViewModel() {
         private set
     var password: String = BuildConfig.password
         private set
-    private lateinit var mGithubService: GithubService
-    private val compositeDisposable = CompositeDisposable()
 
+    private val compositeDisposable = CompositeDisposable()
     val issuesLiveData = MutableLiveData<List<GithubIssueModel>>()
     val repositoriesLiveData = MutableLiveData<List<GithubRepoModel>>()
     val commentLiveData = MutableLiveData<SingleEvent<Boolean>>()
     val networkErrorLiveData = MutableLiveData<SingleEvent<Boolean>>()
     val errorLiveData = MutableLiveData<SingleEvent<String>>()
 
-    fun init(username: String, password: String) {
+    fun onCredential(username: String, password: String) {
         this.username = username
         this.password = password
-        mGithubService = GithubProvider.getInstance(username, password).service
+        GithubRepository.create(username, password)
     }
 
     fun getRepositories() {
         compositeDisposable.add(
-            mGithubService.repos
+            GithubRepository.service.repos
                 .subscribeOn(Schedulers.io())
                 //.observeOn(AndroidSchedulers.mainThread())
                 .map(::mapGithubRepos)
@@ -62,7 +62,7 @@ class MainViewModel : ViewModel() {
 
     fun getIssues(owner: String, name: String) {
         compositeDisposable.add(
-            mGithubService.getIssues(owner, name)
+            GithubRepository.service.getIssues(owner, name)
                 .subscribeOn(Schedulers.io())
                 //.observeOn(AndroidSchedulers.mainThread())
                 .map(::mapGithubIssues)
@@ -81,7 +81,7 @@ class MainViewModel : ViewModel() {
 
     fun addComment(comment: String, issue: GithubIssueModel) {
         if (TextUtils.isEmpty(comment)) {
-            errorLiveData.postValue(SingleEvent("Please enter a comment"))
+            errorLiveData.postValue(SingleEvent(App.getString(R.string.enter_comment)))
             return
         } else {
             val gitComment =
@@ -89,7 +89,7 @@ class MainViewModel : ViewModel() {
             issue.comment = comment
             issue.commentsUrl?.let {
                 compositeDisposable.add(
-                    mGithubService.postComment(it, gitComment)
+                    GithubRepository.service.postComment(it, gitComment)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
@@ -104,7 +104,7 @@ class MainViewModel : ViewModel() {
                         })
                 )
             }
-                ?: errorLiveData.postValue(SingleEvent("Undefined comment url, please try again later"))
+                ?: errorLiveData.postValue(SingleEvent(App.getString(R.string.undefined_comment_url)))
         }
     }
 

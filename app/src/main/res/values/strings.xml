@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Retrofit Github</string>
+    <string name="enter_comment">Please enter a comment</string>
+    <string name="undefined_comment_url">Undefined comment url, please try again later</string>
+    <string name="implements_icredentials">Owner should implements ICredentialsDialogListener interface</string>
+    <string name="credentials">Credentials</string>
+    <string name="cancel">Cancel</string>
+    <string name="accept">Continue</string>
+    <string name="no_repositories">No repositories available</string>
+    <string name="select_repository">Please select repository</string>
+    <string name="user_no_repositories">User has no repositories</string>
+    <string name="comment_created">Comment created!</string>
+    <string name="no_issues">Repository has no issues</string>
+    <string name="generic_network_error">Generic Network Error, please try again later.</string>
 </resources>

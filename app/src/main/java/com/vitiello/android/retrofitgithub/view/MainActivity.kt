@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
         repositoriesSpinner.adapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_dropdown_item,
-            arrayOf("No repositories available")
+            arrayOf(getString(R.string.no_repositories))
         )
 
         repositoriesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
         issuesSpinner.adapter = ArrayAdapter(
             this@MainActivity,
             android.R.layout.simple_spinner_dropdown_item,
-            arrayOf("Please select repository")
+            arrayOf(getString(R.string.select_repository))
         )
     }
 
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
             ArrayAdapter(
                 this,
                 android.R.layout.simple_spinner_dropdown_item,
-                arrayOf("User has no repositories")
+                arrayOf(getString(R.string.user_no_repositories))
             )
         } else {
             repositoriesSpinner.isEnabled = true
@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
     private fun onCommentResponse(event: SingleEvent<Boolean>) {
         if (event.getContentIfNotHandled() == true) {
             commentEditText.setText("")
-            Toast.makeText(this, "Comment created!", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.comment_created), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
             ArrayAdapter(
                 this,
                 android.R.layout.simple_spinner_dropdown_item,
-                arrayOf("Repository has no issues")
+                arrayOf(getString(R.string.no_issues))
             )
         } else {
             issuesSpinner.isEnabled = true
@@ -128,7 +128,7 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
         if (event.getContentIfNotHandled() == true) {
             Toast.makeText(
                 this,
-                "Generic Network Error, please try again later.",
+                getString(R.string.generic_network_error),
                 Toast.LENGTH_LONG
             ).show()
         }
@@ -157,7 +157,7 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
 
     private fun showCredentialsDialog() {
         CredentialsDialog.newInstance(mViewModel.username, mViewModel.password)
-            .show(supportFragmentManager, "credentialsDialog")
+            .show(supportFragmentManager, CredentialsDialog.TAG)
     }
 
     fun onClick(view: View) {
@@ -171,7 +171,7 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
     }
 
     override fun onDialogPositiveClick(username: String, password: String) {
-        mViewModel.init(username, password)
+        mViewModel.onCredential(username, password)
         loadReposButtons.isEnabled = true
     }
 
