@@ -43,6 +43,25 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "access", "color"
+    productFlavors {
+        normal {
+            dimension "access"
+        }
+
+        admin {
+            dimension "access"
+        }
+
+        red {
+            dimension "color"
+        }
+
+        blue {
+            dimension "color"
+        }
+    }
 }
 
 dependencies {

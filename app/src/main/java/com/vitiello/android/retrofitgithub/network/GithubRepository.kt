@@ -1,35 +1,31 @@
 package com.vitiello.android.retrofitgithub.network
 
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.jackson.JacksonConverterFactory
+import com.vitiello.android.retrofitgithub.network.dto.GithubAddCommentDto
+import com.vitiello.android.retrofitgithub.network.dto.GithubIssueDto
+import com.vitiello.android.retrofitgithub.network.dto.GithubRepoDto
+import io.reactivex.Completable
+import io.reactivex.Single
 
 /**
  * Created by Antonio Vitiello on 20/10/2019.
  */
 object GithubRepository {
-    lateinit var service: GithubService
-        private set
+    private lateinit var networkProvider: NetworkProvider
 
-    fun create(username: String, password: String) {
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(BasicAuthInterceptor(username, password))
-            .addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            })
-            .build()
+    fun setCredential(username: String, password: String) {
+        networkProvider = NetworkProvider(username, password)
+    }
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl(GithubService.ENDPOINT)
-            .client(okHttpClient)
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-//            .addConverterFactory(GsonConverterFactory.create())
-            .addConverterFactory(JacksonConverterFactory.create())
-            .build()
+    fun getRepositories(): Single<List<GithubRepoDto>> {
+        return networkProvider.getRepositories()
+    }
 
-        service = retrofit.create(GithubService::class.java)
+    fun getIssues(owner: String, repository: String): Single<List<GithubIssueDto>> {
+        return networkProvider.getIssues(owner, repository)
+    }
+
+    fun postComment(commentUrl: String, gitComment: GithubAddCommentDto): Completable {
+        return networkProvider.postComment(commentUrl, gitComment)
     }
 
 }

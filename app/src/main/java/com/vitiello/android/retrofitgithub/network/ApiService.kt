@@ -10,7 +10,7 @@ import retrofit2.http.*
 /**
  * Created by Antonio Vitiello on 17/10/2019.
  */
-interface GithubService {
+interface ApiService {
 
     @get:GET("user/repos?per_page=100")
     val repos: Single<List<GithubRepoDto>>
@@ -21,7 +21,4 @@ interface GithubService {
     @POST
     fun postComment(@Url url: String, @Body issue: GithubAddCommentDto): Completable
 
-    companion object {
-        val ENDPOINT = "https://api.github.com"
-    }
 }

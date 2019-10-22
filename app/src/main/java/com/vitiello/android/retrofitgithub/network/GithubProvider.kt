@@ -11,12 +11,13 @@ import retrofit2.converter.jackson.JacksonConverterFactory
  */
 class GithubProvider private constructor() {
 
-    lateinit var service: GithubService
+    lateinit var apiService: ApiService
 
     companion object {
 
         @Volatile
         private var INSTANCE: GithubProvider? = null
+        const val ENDPOINT = "https://api.github.com"
 
         fun getInstance(): GithubProvider? = INSTANCE
         fun getInstance(username: String, password: String): GithubProvider =
@@ -34,14 +35,14 @@ class GithubProvider private constructor() {
                     .build()
 
                 val retrofit = Retrofit.Builder()
-                    .baseUrl(GithubService.ENDPOINT)
+                    .baseUrl(ENDPOINT)
                     .client(okHttpClient)
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
 //                    .addConverterFactory(GsonConverterFactory.create())
                     .addConverterFactory(JacksonConverterFactory.create())
                     .build()
 
-                service = retrofit.create(GithubService::class.java)
+                apiService = retrofit.create(ApiService::class.java)
             }
 
     }

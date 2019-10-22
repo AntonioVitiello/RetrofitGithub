@@ -23,9 +23,9 @@ import io.reactivex.schedulers.Schedulers
  */
 class MainViewModel : ViewModel() {
 
-    var username: String = BuildConfig.username
+    var username: String
         private set
-    var password: String = BuildConfig.password
+    var password: String
         private set
 
     private val compositeDisposable = CompositeDisposable()
@@ -35,15 +35,20 @@ class MainViewModel : ViewModel() {
     val networkErrorLiveData = MutableLiveData<SingleEvent<Boolean>>()
     val errorLiveData = MutableLiveData<SingleEvent<String>>()
 
+    init {
+        username = if(BuildConfig.username != "null") BuildConfig.username else ""
+        password = if(BuildConfig.password != "null") BuildConfig.password else ""
+    }
+
     fun onCredential(username: String, password: String) {
         this.username = username
         this.password = password
-        GithubRepository.create(username, password)
+        GithubRepository.setCredential(username, password)
     }
 
     fun getRepositories() {
         compositeDisposable.add(
-            GithubRepository.service.repos
+            GithubRepository.getRepositories()
                 .subscribeOn(Schedulers.io())
                 //.observeOn(AndroidSchedulers.mainThread())
                 .map(::mapGithubRepos)
@@ -60,9 +65,9 @@ class MainViewModel : ViewModel() {
         )
     }
 
-    fun getIssues(owner: String, name: String) {
+    fun getIssues(owner: String, repository: String) {
         compositeDisposable.add(
-            GithubRepository.service.getIssues(owner, name)
+            GithubRepository.getIssues(owner, repository)
                 .subscribeOn(Schedulers.io())
                 //.observeOn(AndroidSchedulers.mainThread())
                 .map(::mapGithubIssues)
@@ -87,9 +92,9 @@ class MainViewModel : ViewModel() {
             val gitComment =
                 GithubAddCommentDto(body = comment, id = issue.id!!, title = issue.title!!)
             issue.comment = comment
-            issue.commentsUrl?.let {
+            issue.commentsUrl?.let { url ->
                 compositeDisposable.add(
-                    GithubRepository.service.postComment(it, gitComment)
+                    GithubRepository.postComment(url, gitComment)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
