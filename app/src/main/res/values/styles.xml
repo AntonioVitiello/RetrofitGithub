@@ -4,4 +4,19 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
+    <style name="styleableToast">
+        <item name="stTextBold">true</item>
+        <item name="stTextColor">@color/colorPrimaryDark</item>
+        <item name="stTextSize">14sp</item>
+        <item name="stColorBackground">@color/colorAccent</item>
+        <item name="stSolidBackground">true</item>
+        <item name="stStrokeWidth">3dp</item>
+        <item name="stStrokeColor">@color/colorPrimary</item>
+        <item name="stIconStart">@drawable/ic_android_black</item>
+        <item name="stLength">LONG</item>
+        <item name="stGravity">center</item>
+        <item name="stRadius">15dp</item>
+    </style>
+
 </resources>

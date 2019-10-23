@@ -6,10 +6,10 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.muddzdev.styleabletoast.StyleableToast
 import com.vitiello.android.retrofitgithub.R
 import com.vitiello.android.retrofitgithub.model.GithubIssueModel
 import com.vitiello.android.retrofitgithub.model.GithubRepoModel
@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
     private fun onCommentResponse(event: SingleEvent<Boolean>) {
         if (event.getContentIfNotHandled() == true) {
             commentEditText.setText("")
-            Toast.makeText(this, getString(R.string.comment_created), Toast.LENGTH_LONG).show()
+            StyleableToast.makeText(this, getString(R.string.comment_created), R.style.styleableToast).show()
         }
     }
 
@@ -126,17 +126,13 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
 
     private fun onNetworkError(event: SingleEvent<Boolean>) {
         if (event.getContentIfNotHandled() == true) {
-            Toast.makeText(
-                this,
-                getString(R.string.generic_network_error),
-                Toast.LENGTH_LONG
-            ).show()
+            StyleableToast.makeText(this, getString(R.string.generic_network_error), R.style.styleableToast).show()
         }
     }
 
     private fun onError(event: SingleEvent<String>) {
-        event.getContentIfNotHandled()?.let {
-            Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+        event.getContentIfNotHandled()?.let { exc ->
+            StyleableToast.makeText(this, exc, R.style.styleableToast).show()
         }
     }
 
