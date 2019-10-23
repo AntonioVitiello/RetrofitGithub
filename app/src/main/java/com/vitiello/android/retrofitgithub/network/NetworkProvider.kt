@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Created by Antonio Vitiello on 22/10/2019.
  */
-class NetworkProvider {
+class NetworkProvider private constructor() {
 
     companion object {
         const val ENDPOINT = "https://api.github.com"
@@ -27,7 +27,7 @@ class NetworkProvider {
         private lateinit var apiService: ApiService
     }
 
-    constructor(username: String, password: String) {
+    constructor(username: String, password: String): this() {
         val httpClient = OkHttpClient.Builder().apply {
             writeTimeout(60, TimeUnit.SECONDS)
             readTimeout(60, TimeUnit.SECONDS)
