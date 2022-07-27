@@ -27,7 +27,7 @@ class NetworkProvider private constructor() {
         private lateinit var apiService: ApiService
     }
 
-    constructor(username: String, password: String): this() {
+    constructor(username: String, password: String) : this() {
         val httpClient = OkHttpClient.Builder().apply {
             writeTimeout(60, TimeUnit.SECONDS)
             readTimeout(60, TimeUnit.SECONDS)

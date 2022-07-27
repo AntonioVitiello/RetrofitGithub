@@ -4,11 +4,12 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.widget.EditText
+import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.vitiello.android.retrofitgithub.R
 import com.vitiello.android.retrofitgithub.tools.isNotEmpty
+import kotlinx.android.synthetic.main.dialog_credentials.view.*
 
 /**
  * Created by Antonio Vitiello on 17/10/2019.
@@ -46,21 +47,18 @@ class CredentialsDialog : DialogFragment() {
 
     @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val view = activity!!.layoutInflater.inflate(R.layout.dialog_credentials, null)
-        val usernameEditText = view.findViewById<EditText>(R.id.usernameEditText).apply {
-            setText(arguments!!.getString(USERNAME_ARGS_KEY))
-        }
-        val passwordEditText = view.findViewById<EditText>(R.id.passwordEditText).apply {
-            setText(arguments!!.getString(PASSWORD_ARGS_KEY))
-        }
-        val builder = AlertDialog.Builder(activity!!)
+        val view = LayoutInflater.from(context).inflate(R.layout.dialog_credentials, null)
+        view.usernameEditText.setText(requireArguments().getString(USERNAME_ARGS_KEY))
+        view.passwordEditText.setText(requireArguments().getString(PASSWORD_ARGS_KEY))
+        isCancelable = false
+        val builder = AlertDialog.Builder(requireContext())
             .setView(view)
             .setTitle(getString(R.string.credentials))
             .setNegativeButton(getString(R.string.cancel), null)
             .setPositiveButton(getString(R.string.accept)) { dialog, which ->
                 isNotEmpty(
-                    usernameEditText.text.toString(),
-                    passwordEditText.text.toString()
+                    view.usernameEditText.text.toString(),
+                    view.passwordEditText.text.toString()
                 ) { username, password ->
                     listener.onDialogPositiveClick(username, password)
                 }

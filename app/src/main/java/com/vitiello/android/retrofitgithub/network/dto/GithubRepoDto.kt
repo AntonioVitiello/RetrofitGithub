@@ -17,7 +17,7 @@ data class GithubRepoDto(
     @JsonProperty("full_name")
     val fullName: String?,
     @JsonProperty("private")
-    val `private`: Boolean?,
+    val private: Boolean?,
     @JsonProperty("owner")
     val owner: Owner?,
     @JsonProperty("html_url")

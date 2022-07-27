@@ -39,7 +39,16 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
         mViewModel.errorLiveData.observe(this, Observer(::onError))
 
         initComponents()
+    }
 
+    override fun onResume() {
+        super.onResume()
+        StyleableToast.makeText(
+            this,
+            getString(R.string.github_oauth_msg),
+            10000,
+            R.style.styleableToast
+        ).show()
     }
 
     private fun initComponents() {
@@ -100,7 +109,11 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
     private fun onCommentResponse(event: SingleEvent<Boolean>) {
         if (event.getContentIfNotHandled() == true) {
             commentEditText.setText("")
-            StyleableToast.makeText(this, getString(R.string.comment_created), R.style.styleableToast).show()
+            StyleableToast.makeText(
+                this,
+                getString(R.string.comment_created),
+                R.style.styleableToast
+            ).show()
         }
     }
 
@@ -126,7 +139,11 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
 
     private fun onNetworkError(event: SingleEvent<Boolean>) {
         if (event.getContentIfNotHandled() == true) {
-            StyleableToast.makeText(this, getString(R.string.generic_network_error), R.style.styleableToast).show()
+            StyleableToast.makeText(
+                this,
+                getString(R.string.generic_network_error),
+                R.style.styleableToast
+            ).show()
         }
     }
 
