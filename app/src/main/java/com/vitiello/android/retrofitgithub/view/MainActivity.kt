@@ -1,20 +1,23 @@
 package com.vitiello.android.retrofitgithub.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import com.muddzdev.styleabletoast.StyleableToast
 import com.vitiello.android.retrofitgithub.R
 import com.vitiello.android.retrofitgithub.model.GithubIssueModel
 import com.vitiello.android.retrofitgithub.model.GithubRepoModel
 import com.vitiello.android.retrofitgithub.tools.SingleEvent
 import com.vitiello.android.retrofitgithub.tools.isNotEmpty
+import com.vitiello.android.retrofitgithub.view.LoginActivity.Companion.STARGAZERS_CODE
+import com.vitiello.android.retrofitgithub.view.LoginActivity.Companion.STARGAZERS_SCHEME
 import com.vitiello.android.retrofitgithub.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -22,33 +25,38 @@ import kotlinx.android.synthetic.main.activity_main.*
  * Created by Antonio Vitiello on 17/10/2019.
  */
 class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogListener {
-
-    private lateinit var mViewModel: MainViewModel
+    private val ITEMS_PER_PAGE = 100
+    private val mViewModel by viewModels<MainViewModel>()
+    private var mStargazersCode: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-
-        mViewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        handleIntent(intent)
 
         mViewModel.issuesLiveData.observe(this, Observer(::onIssuesResponse))
         mViewModel.repositoriesLiveData.observe(this, Observer(::onRepositoriesResponse))
         mViewModel.commentLiveData.observe(this, Observer(::onCommentResponse))
         mViewModel.networkErrorLiveData.observe(this, Observer(::onNetworkError))
+        mViewModel.loginLiveData.observe(this, Observer(::onLogin))
         mViewModel.errorLiveData.observe(this, Observer(::onError))
 
         initComponents()
     }
 
-    override fun onResume() {
-        super.onResume()
-        StyleableToast.makeText(
-            this,
-            getString(R.string.github_oauth_msg),
-            10000,
-            R.style.styleableToast
-        ).show()
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        intent?.data?.let { uri ->
+            if (STARGAZERS_SCHEME == uri.scheme) {
+                mStargazersCode = uri.getQueryParameter(STARGAZERS_CODE)
+                login()
+            }
+        }
     }
 
     private fun initComponents() {
@@ -175,7 +183,7 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
 
     fun onClick(view: View) {
         when (view.id) {
-            R.id.loadReposButtons -> mViewModel.getRepositories()
+            R.id.loadReposButtons -> mViewModel.getRepositories(ITEMS_PER_PAGE)
             R.id.sendButton -> mViewModel.addComment(
                 commentEditText.text.toString(),
                 issuesSpinner.selectedItem as GithubIssueModel
@@ -185,7 +193,28 @@ class MainActivity : AppCompatActivity(), CredentialsDialog.ICredentialsDialogLi
 
     override fun onDialogPositiveClick(username: String, password: String) {
         mViewModel.onCredential(username, password)
-        loadReposButtons.isEnabled = true
+        StyleableToast.makeText(
+            this,
+            getString(R.string.github_oauth_msg),
+            3000,
+            R.style.styleableToast
+        ).show()
+    }
+
+    fun login() {
+        mStargazersCode?.let { stargazersCode ->
+            mViewModel.login(
+                getString(R.string.client_id),
+                getString(R.string.client_sec),
+                stargazersCode
+            )
+        }
+    }
+
+    private fun onLogin(event: SingleEvent<Boolean>) {
+        event.getContentIfNotHandled()?.let { success ->
+            loadReposButtons.isEnabled = success
+        }
     }
 
 }

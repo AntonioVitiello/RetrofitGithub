@@ -156,6 +156,7 @@ data class GithubRepoDto(
     val mirrorUrl: String?
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Owner(
     @JsonProperty("login")
     val login: String?,
@@ -195,6 +196,7 @@ data class Owner(
     val siteAdmin: Boolean?
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Permissions(
     @JsonProperty("admin")
     val admin: Boolean?,

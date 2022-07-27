@@ -1,24 +1,22 @@
 package com.vitiello.android.retrofitgithub.network
 
-import com.vitiello.android.retrofitgithub.network.dto.GithubAddCommentDto
-import com.vitiello.android.retrofitgithub.network.dto.GithubIssueDto
-import com.vitiello.android.retrofitgithub.network.dto.GithubRepoDto
-import io.reactivex.Completable
+import com.vitiello.android.retrofitgithub.network.dto.GithubTokenResponse
 import io.reactivex.Single
-import retrofit2.http.*
+import retrofit2.http.Headers
+import retrofit2.http.POST
+import retrofit2.http.Query
 
 /**
  * Created by Antonio Vitiello on 17/10/2019.
  */
 interface ApiService {
 
-    @get:GET("user/repos?per_page=100")
-    val repos: Single<List<GithubRepoDto>>
-
-    @GET("/repos/{owner}/{repo}/issues")
-    fun getIssues(@Path("owner") owner: String, @Path("repo") repository: String): Single<List<GithubIssueDto>>
-
-    @POST
-    fun postComment(@Url url: String, @Body issue: GithubAddCommentDto): Completable
+    @Headers("Accept: application/vnd.github+json", "Content-Type: application/json")
+    @POST("login/oauth/access_token")
+    fun loadToken(
+        @Query("client_id") idClient: String,
+        @Query("client_secret") clientSecret: String,
+        @Query("code") code: String
+    ): Single<GithubTokenResponse>
 
 }

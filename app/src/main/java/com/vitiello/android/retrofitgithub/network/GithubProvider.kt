@@ -11,7 +11,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory
  */
 class GithubProvider private constructor() {
 
-    lateinit var apiService: ApiService
+    lateinit var apiService: ApiAuthService
 
     companion object {
 
@@ -38,11 +38,10 @@ class GithubProvider private constructor() {
                     .baseUrl(ENDPOINT)
                     .client(okHttpClient)
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-//                    .addConverterFactory(GsonConverterFactory.create())
                     .addConverterFactory(JacksonConverterFactory.create())
                     .build()
 
-                apiService = retrofit.create(ApiService::class.java)
+                apiService = retrofit.create(ApiAuthService::class.java)
             }
 
     }
